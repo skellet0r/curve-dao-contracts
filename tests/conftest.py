@@ -58,7 +58,7 @@ def theoretical_supply(chain: Chain, token: Contract) -> Callable:
         )
         return S
 
-    yield _fn
+    return _fn
 
 
 # account aliases
@@ -66,26 +66,26 @@ def theoretical_supply(chain: Chain, token: Contract) -> Callable:
 
 @pytest.fixture(scope="session")
 def alice(accounts: Accounts) -> Account:
-    """Yield the first available test account."""
-    yield accounts[0]
+    """Return the first available test account."""
+    return accounts[0]
 
 
 @pytest.fixture(scope="session")
 def bob(accounts: Accounts) -> Account:
-    """Yield the second available test account."""
-    yield accounts[1]
+    """Return the second available test account."""
+    return accounts[1]
 
 
 @pytest.fixture(scope="session")
 def charlie(accounts: Accounts) -> Account:
-    """Yield the third available test account."""
-    yield accounts[2]
+    """Return the third available test account."""
+    return accounts[2]
 
 
 @pytest.fixture(scope="session")
 def receiver(accounts: Accounts) -> Account:
-    """Yield a dummy receiver account."""
-    yield accounts.at("0x0000000000000000000000000000000000031337", True)
+    """Return a dummy receiver account."""
+    return accounts.at("0x0000000000000000000000000000000000031337", True)
 
 
 # core contracts
@@ -93,82 +93,82 @@ def receiver(accounts: Accounts) -> Account:
 
 @pytest.fixture(scope="module")
 def token(ERC20CRV: ContractContainer, alice: Account) -> Contract:
-    """Yield an instance of the ERC20CRV contract."""
-    yield ERC20CRV.deploy("Curve DAO Token", "CRV", 18, {"from": alice})
+    """Return an instance of the ERC20CRV contract."""
+    return ERC20CRV.deploy("Curve DAO Token", "CRV", 18, {"from": alice})
 
 
 @pytest.fixture(scope="module")
 def voting_escrow(VotingEscrow: ContractContainer, alice: Account, token: Contract) -> Contract:
-    """Yield an instance of the VotingEscrow contract."""
-    yield VotingEscrow.deploy(token, "Voting-escrowed CRV", "veCRV", "veCRV_0.99", {"from": alice})
+    """Return an instance of the VotingEscrow contract."""
+    return VotingEscrow.deploy(token, "Voting-escrowed CRV", "veCRV", "veCRV_0.99", {"from": alice})
 
 
 @pytest.fixture(scope="module")
 def gauge_controller(
     GaugeController: ContractContainer, alice: Account, token: Contract, voting_escrow: Contract,
 ) -> Contract:
-    """Yield an instance of the GaugeController contract."""
-    yield GaugeController.deploy(token, voting_escrow, {"from": alice})
+    """Return an instance of the GaugeController contract."""
+    return GaugeController.deploy(token, voting_escrow, {"from": alice})
 
 
 @pytest.fixture(scope="module")
 def minter(
     Minter: ContractContainer, alice: Account, gauge_controller: Contract, token: Contract,
 ) -> Contract:
-    """Yield an instance of the Minter contract."""
-    yield Minter.deploy(token, gauge_controller, {"from": alice})
+    """Return an instance of the Minter contract."""
+    return Minter.deploy(token, gauge_controller, {"from": alice})
 
 
 @pytest.fixture(scope="module")
 def pool_proxy(PoolProxy: ContractContainer, alice: Account) -> Contract:
-    """Yield an instance of the PoolProxy contract."""
-    yield PoolProxy.deploy(alice, alice, alice, {"from": alice})
+    """Return an instance of the PoolProxy contract."""
+    return PoolProxy.deploy(alice, alice, alice, {"from": alice})
 
 
 @pytest.fixture(scope="module")
 def gauge_proxy(GaugeProxy: ContractContainer, alice: Account, bob: Account) -> Contract:
-    """Yield an instance of the GaugeProxy contract."""
-    yield GaugeProxy.deploy(alice, bob, {"from": alice})
+    """Return an instance of the GaugeProxy contract."""
+    return GaugeProxy.deploy(alice, bob, {"from": alice})
 
 
 @pytest.fixture(scope="module")
 def coin_reward(ERC20: ContractContainer, alice: Account) -> Contract:
-    """Yield a mock ERC20 contract."""
-    yield ERC20.deploy("YFIIIIII Funance", "YFIIIIII", 18, {"from": alice})
+    """Return a mock ERC20 contract."""
+    return ERC20.deploy("YFIIIIII Funance", "YFIIIIII", 18, {"from": alice})
 
 
 @pytest.fixture(scope="module")
 def reward_contract(
     CurveRewards: ContractContainer, mock_lp_token: Contract, alice: Account, coin_reward: Contract,
 ):
-    """Yield an instance of the CurveRewards contract."""
+    """Return an instance of the CurveRewards contract."""
     contract = CurveRewards.deploy(mock_lp_token, coin_reward, {"from": alice})
     contract.setRewardDistribution(alice, {"from": alice})
-    yield contract
+    return contract
 
 
 @pytest.fixture(scope="module")
 def liquidity_gauge(
     LiquidityGauge: ContractContainer, alice: Account, mock_lp_token: Contract, minter: Contract
 ) -> Contract:
-    """Yield an instance of the LiquidityGauge contract."""
-    yield LiquidityGauge.deploy(mock_lp_token, minter, alice, {"from": alice})
+    """Return an instance of the LiquidityGauge contract."""
+    return LiquidityGauge.deploy(mock_lp_token, minter, alice, {"from": alice})
 
 
 @pytest.fixture(scope="module")
 def gauge_v2(
     LiquidityGaugeV2: ContractContainer, alice: Account, mock_lp_token: Contract, minter: Contract
 ) -> Contract:
-    """Yield an instance of the LiquidityGaugeV2 contract."""
-    yield LiquidityGaugeV2.deploy(mock_lp_token, minter, alice, {"from": alice})
+    """Return an instance of the LiquidityGaugeV2 contract."""
+    return LiquidityGaugeV2.deploy(mock_lp_token, minter, alice, {"from": alice})
 
 
 @pytest.fixture(scope="module")
 def gauge_wrapper(
     LiquidityGaugeWrapper: ContractContainer, alice: Account, liquidity_gauge: Contract
 ) -> Contract:
-    """Yield an instance of the LiquidityGaugeWrapper contract."""
-    yield LiquidityGaugeWrapper.deploy(
+    """Return an instance of the LiquidityGaugeWrapper contract."""
+    return LiquidityGaugeWrapper.deploy(
         "Tokenized Gauge", "TG", liquidity_gauge, alice, {"from": alice}
     )
 
@@ -182,8 +182,8 @@ def liquidity_gauge_reward(
     reward_contract: Contract,
     coin_reward: Contract,
 ) -> Contract:
-    """Yield an instance of the LiquidityGaugeReward contract."""
-    yield LiquidityGaugeReward.deploy(
+    """Return an instance of the LiquidityGaugeReward contract."""
+    return LiquidityGaugeReward.deploy(
         mock_lp_token, minter, reward_contract, coin_reward, alice, {"from": alice},
     )
 
@@ -194,8 +194,8 @@ def reward_gauge_wrapper(
     alice: Account,
     liquidity_gauge_reward: Contract,
 ) -> Contract:
-    """Yield an instance of the LiquidityGaugeRewardWrapper contract."""
-    yield LiquidityGaugeRewardWrapper.deploy(
+    """Return an instance of the LiquidityGaugeRewardWrapper contract."""
+    return LiquidityGaugeRewardWrapper.deploy(
         "Tokenized Reward Gauge", "TG", liquidity_gauge_reward, alice, {"from": alice},
     )
 
@@ -204,12 +204,12 @@ def reward_gauge_wrapper(
 def three_gauges(
     LiquidityGauge: ContractContainer, alice: Account, mock_lp_token: Contract, minter: Contract
 ) -> List[Contract]:
-    """Yield a list of three LiquidityGauge contracts."""
+    """Return a list of three LiquidityGauge contracts."""
     contracts = [
         LiquidityGauge.deploy(mock_lp_token, minter, alice, {"from": alice}) for _ in range(3)
     ]
 
-    yield contracts
+    return contracts
 
 
 # VestingEscrow fixtures
@@ -217,14 +217,14 @@ def three_gauges(
 
 @pytest.fixture(scope="module")
 def start_time(chain: Chain) -> int:
-    """Yield the timestamp of a year + approx. sixteen minutes from the chain time."""
-    yield chain.time() + 1000 + 86400 * 365
+    """Return the timestamp of a year + approx. sixteen minutes from the chain time."""
+    return chain.time() + 1000 + 86400 * 365
 
 
 @pytest.fixture(scope="module")
 def end_time(start_time: int):
-    """Yield the timestamp of start_time + approx. 3 years."""
-    yield start_time + 100_000_000
+    """Return the timestamp of start_time + approx. 3 years."""
+    return start_time + 100_000_000
 
 
 @pytest.fixture(scope="module")
@@ -236,27 +236,27 @@ def vesting(
     start_time: int,
     end_time: int,
 ) -> Contract:
-    """Yield an instance of the VestingEscrow contract."""
+    """Return an instance of the VestingEscrow contract."""
     contract = VestingEscrow.deploy(
         coin_a, start_time, end_time, True, accounts[1:5], {"from": alice}
     )
     coin_a._mint_for_testing(10 ** 21, {"from": alice})
     coin_a.approve(contract, 10 ** 21, {"from": alice})
-    yield contract
+    return contract
 
 
 @pytest.fixture(scope="module")
 def vesting_target(VestingEscrowSimple: ContractContainer, alice: Account) -> Contract:
-    """Yield an instance of the VestingEscrowSimple contract."""
-    yield VestingEscrowSimple.deploy({"from": alice})
+    """Return an instance of the VestingEscrowSimple contract."""
+    return VestingEscrowSimple.deploy({"from": alice})
 
 
 @pytest.fixture(scope="module")
 def vesting_factory(
     VestingEscrowFactory: ContractContainer, alice: Account, vesting_target: Contract
 ) -> Contract:
-    """Yield an instance of the VestingEscrowFactory contract."""
-    yield VestingEscrowFactory.deploy(vesting_target, alice, {"from": alice})
+    """Return an instance of the VestingEscrowFactory contract."""
+    return VestingEscrowFactory.deploy(vesting_target, alice, {"from": alice})
 
 
 @pytest.fixture(scope="module")
@@ -268,13 +268,13 @@ def vesting_simple(
     coin_a: Contract,
     start_time: int,
 ) -> Contract:
-    """Deploy a VestingEscrow contract through VestingEscrowFactory and yield it."""
+    """Deploy a VestingEscrow contract through VestingEscrowFactory and return it."""
     coin_a._mint_for_testing(10 ** 21, {"from": alice})
     coin_a.transfer(vesting_factory, 10 ** 21, {"from": alice})
     tx = vesting_factory.deploy_vesting_contract(
         coin_a, bob, 10 ** 20, True, 100000000, start_time, {"from": alice},
     )
-    yield VestingEscrowSimple.at(tx.new_contracts[0])
+    return VestingEscrowSimple.at(tx.new_contracts[0])
 
 
 # parametrized burner fixture
@@ -296,17 +296,17 @@ def vesting_simple(
 def burner(
     alice: Account, bob: Account, receiver: Account, pool_proxy: Contract, request
 ) -> Contract:
-    """Parameterized fixture which yields a Burner contract."""
+    """Parameterized fixture which returns a Burner contract."""
     Burner: ContractContainer = request.param
     args = (pool_proxy, receiver, receiver, alice, bob, {"from": alice})
     idx = len(Burner.deploy.abi["inputs"]) + 1
 
-    yield Burner.deploy(*args[-idx:])
+    return Burner.deploy(*args[-idx:])
 
     # if len(Burner.deploy.abi['inputs']) == 4:
-    #     yield Burner.deploy(receiver, receiver, alice, bob, {'from': alice})
+    #     return Burner.deploy(receiver, receiver, alice, bob, {'from': alice})
     # else:
-    #     yield Burner.deploy(receiver, alice, bob, {'from': alice})
+    #     return Burner.deploy(receiver, alice, bob, {'from': alice})
 
 
 # testing contracts
@@ -314,24 +314,24 @@ def burner(
 
 @pytest.fixture(scope="module")
 def coin_a(ERC20: ContractContainer, alice: Account) -> Contract:
-    """Yield a mock ERC20 contract."""
-    yield ERC20.deploy("Coin A", "USDA", 18, {"from": alice})
+    """Return a mock ERC20 contract."""
+    return ERC20.deploy("Coin A", "USDA", 18, {"from": alice})
 
 
 @pytest.fixture(scope="module")
 def coin_b(ERC20: ContractContainer, alice: Account) -> Contract:
-    """Yield a mock ERC20 contract."""
-    yield ERC20.deploy("Coin B", "USDB", 18, {"from": alice})
+    """Return a mock ERC20 contract."""
+    return ERC20.deploy("Coin B", "USDB", 18, {"from": alice})
 
 
 @pytest.fixture(scope="module")
 def mock_lp_token(ERC20LP: ContractContainer, alice: Account) -> Contract:
-    """Yield a mock LP ERC20 contract.
+    """Return a mock LP ERC20 contract.
 
     Note:
         Not using the actual Curve LP contract.
     """
-    yield ERC20LP.deploy("Curve LP token", "usdCrv", 18, 10 ** 9, {"from": alice})
+    return ERC20LP.deploy("Curve LP token", "usdCrv", 18, 10 ** 9, {"from": alice})
 
 
 @pytest.fixture(scope="module")
@@ -342,13 +342,13 @@ def pool(
     coin_a: Contract,
     coin_b: Contract,
 ) -> Contract:
-    """Yield a CurvePool contract"""
+    """Return a CurvePool contract"""
     curve_pool = CurvePool.deploy(
         [coin_a, coin_b], mock_lp_token, 100, 4 * 10 ** 6, {"from": alice}
     )
     mock_lp_token.set_minter(curve_pool, {"from": alice})
 
-    yield curve_pool
+    return curve_pool
 
 
 @pytest.fixture(scope="module")
@@ -359,11 +359,11 @@ def fee_distributor(
     coin_a: Contract,
     chain: Chain,
 ) -> Callable:
-    """Yield a callable which deploys a FeeDistributor contract."""
+    """Return a callable which deploys a FeeDistributor contract."""
 
     def f(t: int = None) -> Contract:
         if not t:
             t = chain.time()
         return FeeDistributor.deploy(voting_escrow, t, coin_a, alice, alice, {"from": alice})
 
-    yield f
+    return f
